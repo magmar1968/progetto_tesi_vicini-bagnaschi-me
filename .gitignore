@@ -1,0 +1,11 @@
+POWHEG/
+file_log/
+gen_seeds
+POWHEG-BOX-V2/
+powheg.input
+pwgevents_test.lhe
+pwgseeds.dat
+pwhg_main
+risultati/
+
+
