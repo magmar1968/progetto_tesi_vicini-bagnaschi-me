@@ -8,22 +8,33 @@ echo "#!/bin/bash
 #SBATCH --time=20-0:0
 #SBATCH --array=1-100
 
+###VARIABLES DEFINITIONS
 ID=\$SLURM_ARRAY_TASK_ID
+JOBID=\$SLURM_ARRAY_JOB_ID
 RISULTATI=${MYDIR}risultati/ris_\$ID/
 printf -v PAD_ID "%04d" \$ID
 EVENTS_FILE=pwgevents-\$PAD_ID.lhe
 OUT_FILE=out-\${PAD_ID}_ph-2.tar.gz
+LOG_OUT=out_log-\${PAD_ID}_ph2.txt
 
-cd \&SLURM_TMPDIR
-tar -zxvf \${RISULTATI}out-\${ID}.tar.gz ./\$EVENTS_FILE
+
+mkdir -p ./file_log/file_log-\$JOBID
+
+###COPYING ALL NECESSARY FILES TO THE WORKING DIRECTORY
+cd \$SLURM_TMPDIR
+tar -zxf \${RISULTATI}out-\${ID}.tar.gz ./\$EVENTS_FILE
 cp ${MYDIR}pwhg_main .
 cp ${MYDIR}powheg.input .
-cp ${MYDIR}nnpdf21_100.xml .
-cp \$RISULTATI\${EVENTS_FILE} .
+cp ${MYDIR}nnpdf31_100.xml .
+cp ${MYDIR}pwgseeds.dat .
+#cp \$RISULTATI\${EVENTS_FILE} .
+mv \$EVENTS_FILE pwgevents.lhe ##pwhg_main look for a file named pwgevents.lhe
 
-./pwhg_main \$EVENTS_FILE > out_log\${PAD_ID}_ph2.txt
+echo \$ID | ./pwhg_main > \$LOG_OUT
+mv pwgevents-rwgt.lhe pwgevents-rwgt-\${PAD_ID}.lhe
 tar czvf \$OUT_FILE ./*
-mv \$OUT_FILE \$RISULTATI" > b.sh
+mv \$OUT_FILE \$RISULTATI
+mv \$LOG_OUT ${MYDIR}file_log/file_log-\$JOBID" > b.sh
 
 cat b.sh
 
